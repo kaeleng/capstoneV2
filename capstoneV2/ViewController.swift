@@ -16,6 +16,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     var distance : Double! = nil
     var steps : NSNumber! = nil
     var stepMessageTriggered = false
+    var distanceMessageTriggered = false
     
     private let activityManager = CMMotionActivityManager()
     private let pedometer = CMPedometer()
@@ -36,6 +37,8 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         // Set the scene to the view
         sceneView.scene = scene
+        
+        
         
     }
     
@@ -77,29 +80,43 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             guard let pedometerData = pedometerData, error == nil else { return }
             
             DispatchQueue.main.async{
-                self?.distance = pedometerData.distance?.doubleValue
-                self?.steps = pedometerData.numberOfSteps
-//                self?.doStuffBasedOnDistance(distance: self?.distance)
-                self?.doStuffBasedOnSteps(steps: self?.steps)
+//                self?.distance = pedometerData.distance?.doubleValue
+//                self?.steps = pedometerData.numberOfSteps
+                self?.doStuffBasedOnDistance(distance: pedometerData.distance?.doubleValue)
+//                self?.doStuffBasedOnSteps(steps: self?.steps)
                 print(pedometerData.distance ?? 0)
-                print("Steps: ")
-                print(self?.steps)
+//                print("Steps: ")
+//                print(self?.steps)
             }
         }
     }
 
-//    private func doStuffBasedOnDistance(distance: Double?){
-//        if distance! == 1.0 {
-//            print("distance 1")
-//        }
-//    }
-    
-    private func doStuffBasedOnSteps(steps: NSNumber?){
-        if Int(truncating: steps!) >= 20 && stepMessageTriggered == false {
-            stepMessageTriggered = true
-            print("20 steps")
+    private func doStuffBasedOnDistance(distance: Double?){
+        if distance! > 1.0 && distanceMessageTriggered == false {
+            distanceMessageTriggered = true
+            print("distance 1")
+            
+            let text = SCNText(string: "First checkpoint", extrusionDepth: 1)
+            let material = SCNMaterial()
+            material.diffuse.contents = UIColor.green
+            text.materials = [material]
+            
+            let node = SCNNode()
+            node.position = SCNVector3(0, 0.02, -0.1)
+            node.scale = SCNVector3(0.001, 0.001, 0.001)
+            node.geometry = text
+            
+            sceneView.scene.rootNode.addChildNode(node)
+            sceneView.autoenablesDefaultLighting = true
         }
     }
+    
+//    private func doStuffBasedOnSteps(steps: NSNumber?){
+//        if Int(truncating: steps!) >= 20 && stepMessageTriggered == false {
+//            stepMessageTriggered = true
+//            print("20 steps")
+//        }
+//    }
     
     // MARK: - ARSCNViewDelegate
     
